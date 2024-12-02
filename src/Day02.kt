@@ -2,6 +2,14 @@ import kotlin.math.abs
 
 fun main() {
 
+    fun List<Int>.subLists(): List<List<Int>> {
+        val lists = mutableListOf<List<Int>>()
+        for (i in 1..this.size) {
+            lists.add(subList(0, i - 1) + this.subList(i, this.size))
+        }
+        return lists
+    }
+
     fun checkRow(row:List<Int>):Boolean {
         val slope = row[1] - row[0] > 0
         return row.withIndex().all { (i, el) ->
@@ -16,18 +24,7 @@ fun main() {
 
     fun part2(input: List<String>): Int {
         val rows = input.map { row -> row.split(" ").map{ it.toInt() } }
-        return rows.filter { row ->
-            var res = checkRow(row)
-            var j = 1
-            while (!res && j <= row.size) {
-                val checkedRow = row.subList(0,j-1) + row.subList(j, row.size)
-                check(checkedRow.size == row.size -1)
-                res = checkRow(checkedRow)
-                if (res) checkedRow.println()
-                j += 1
-            }
-            res
-        }.size
+        return rows.filter { row -> row.subLists().any { checkRow(it) } }.size
     }
 
     val testInput = readInput("Day02_test")
