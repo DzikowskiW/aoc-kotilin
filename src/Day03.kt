@@ -12,7 +12,7 @@ fun main() {
             when (el.groupValues[0]) {
                 "do()" -> Pair(sum, true)
                 "don't()" -> Pair(sum, false)
-                else -> Pair(if (enabled) sum + el.groupValues[1].toInt() * el.groupValues[2].toInt() else sum , enabled)
+                else -> Pair(if (enabled) sum + el.groupValues[1].toInt() * el.groupValues[2].toInt() else sum, enabled)
             }
         }.first
 
