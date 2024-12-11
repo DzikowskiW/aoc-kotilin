@@ -49,21 +49,21 @@ fun main() {
             }
             !free
         }
-
         for (n in digit-1 downTo 0) {
             val nSize = diskSizes[n]!!
             var curFreeSpace = 0
             for (j in disk.indices) {
                 if (disk[j] == n) break
                 if (disk[j] == -1) curFreeSpace += 1
-                if (disk[j+1] != -1 ) curFreeSpace = 0
+                if (disk[j] != -1 ) curFreeSpace = 0
                 if (curFreeSpace >= nSize) {
                     val neww = j - curFreeSpace + 1
-                    val old = disk.first { it == n }
-                    for (k in 0..<curFreeSpace) {
+                    val old = disk.indexOf(n)
+                    for (k in 0..<nSize) {
                         disk[neww+k] = n
-                        disk[old] = -1
+                        disk[old+k] = -1
                     }
+                    break
                 }
             }
         }
@@ -73,15 +73,14 @@ fun main() {
             if (disk[i] != -1)
             count +=  i * disk[i]
         }
-        disk.println()
         return count
     }
 
     val testInput = readInput("Day09_test")
-//    part1(testInput).println()
+    part1(testInput).println()
     part2(testInput).println()
 
     val input = readInput("Day09")
-    // part1(input).println()
-    // part2(input).println()
+     part1(input).println()
+     part2(input).println()
 }
