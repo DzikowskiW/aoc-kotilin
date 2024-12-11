@@ -1,68 +1,30 @@
 fun main() {
-
-    fun part1(input: List<String>): Int {
-        val cache = hashMapOf<Pair<Int,Int>,MutableSet<Pair<Int,Int>>>()
-        fun calcTrail(toFind:Char, yy: Int, xx: Int):MutableSet<Pair<Int,Int>>? {
-            if (yy !in input.indices || xx !in 0..<input[0].length) {
-                return null
+    val cache = hashMapOf<Pair<Long,Int>, Long>()
+    fun solve(input: List<String>): Any{
+        fun calc(n: Long, level:Int):Long {
+            if (level == 0) return 1
+            val i = Pair(n, level)
+            if (!cache.containsKey(i)) {
+                val nstr = n.toString()
+                cache[i] = if (n == 0L) {
+                        calc(1, level - 1)
+                    } else if (nstr.length % 2 == 0) {
+                        val mid = nstr.length / 2
+                        calc(nstr.substring(0, mid).toLong(), level - 1) + calc(nstr.substring(mid).toLong(), level - 1)
+                    } else {
+                        calc(n * 2024, level - 1)
+                    }
             }
-            if (input[yy][xx] != toFind) {
-                return null
-            }
-            if (Pair(yy,xx) !in cache) {
-                val  c = input[yy][xx]
-                if (c == '9') {
-                    cache[Pair(yy, xx)] = mutableSetOf(Pair(yy,xx))
-                } else {
-                    val s = cache.getOrPut(Pair(yy,xx)) { mutableSetOf() }
-                    s.addAll(calcTrail(c + 1, yy-1, xx).orEmpty())
-                    s.addAll(calcTrail(c + 1, yy+1, xx).orEmpty())
-                    s.addAll(calcTrail(c + 1, yy, xx-1).orEmpty())
-                    s.addAll(calcTrail(c + 1, yy, xx+1).orEmpty())
-                }
-            }
-            return cache[Pair(yy,xx)]
+            return cache[i]!!
         }
-        return input.withIndex().fold(0) { res, (y, row) ->
-            res + row.withIndex().fold(0) { acc, (x,c) ->
-                acc + if (c == '0') calcTrail(c,y,x).orEmpty().size else 0
-            }
-        }
-    }
-
-
-    fun part2(input: List<String>): Int {
-        val cache = hashMapOf<Pair<Int,Int>,Int>()
-        fun calcTrail(toFind:Char, yy: Int, xx: Int):Int {
-            if (yy !in input.indices || xx !in 0..<input[0].length) {
-                return 0
-            }
-            if (input[yy][xx] != toFind) {
-                return 0
-            }
-            if (Pair(yy,xx) !in cache) {
-                val  c = input[yy][xx]
-                if (c == '9') {
-                    cache[Pair(yy, xx)] = 1
-                } else {
-                    cache[Pair(yy,xx)]= calcTrail(c + 1, yy-1, xx) +
-                        calcTrail(c + 1, yy+1, xx) +
-                        calcTrail(c + 1, yy, xx-1) +
-                        calcTrail(c + 1, yy, xx+1)
-                }
-            }
-            return cache[Pair(yy,xx)]!!
-        }
-
-        return input.withIndex().fold(0) { res, (y, row) ->
-            res + row.withIndex().fold(0) { acc, (x,c) -> acc + if (c == '0') calcTrail(c,y,x) else 0 }
-        }
+        val res1 =  input[0].split(" ").fold(0L) { acc, n ->  acc + calc(n.toLong(),25) }
+        val res2 =  input[0].split(" ").fold(0L) { acc, n ->  acc + calc(n.toLong(),75) }
+        return Pair(res1, res2)
     }
 
     val testInput = readInput("Day10_test")
-//    part1(testInput).println()
+    solve(testInput).println()
 
     val input = readInput("Day10")
-    part1(input).println()
-    part2(input).println()
+    solve(input).println()
 }
