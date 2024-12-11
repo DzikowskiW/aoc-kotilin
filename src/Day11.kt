@@ -22,9 +22,9 @@ fun main() {
         return Pair(res1, res2)
     }
 
-    val testInput = readInput("Day10_test")
+    val testInput = readInput("Day11_test")
     solve(testInput).println()
 
-    val input = readInput("Day10")
+    val input = readInput("Day11")
     solve(input).println()
 }
