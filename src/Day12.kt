@@ -5,8 +5,11 @@ fun main() {
             val checked = mutableSetOf<Pair<Int, Int>>()
             val toCheck = mutableListOf<Pair<Int, Int>>(Pair(sY, sX))
             var area = 0
+            var sides = 0
             var perimeter = 0
             val sval = input[sY][sX]
+            val maxy = input.size
+            val maxx = input[0].length
             while (toCheck.isNotEmpty()) {
                 val cur = toCheck.removeFirst()
                 val (y, x) = cur
@@ -15,6 +18,18 @@ fun main() {
                 filled.add(cur)
 
                 area += 1
+//                println("($y,$x) $maxy")
+                // check outside corners
+                if ((y-1 < 0 || (input[y-1][x] != sval)) && (x-1<0 || input[y][x-1] != sval)) sides +=1
+                if ((y-1 < 0 || (input[y-1][x] != sval)) && (x+1 >= maxx || input[y][x+1] != sval)) sides +=1
+                if ((y+1 >= maxy || (input[y+1][x] != sval)) && (x-1<0 || input[y][x-1] != sval)) sides +=1
+                if ((y+1 >= maxy || (input[y+1][x] != sval)) && (x+1 >= maxx || input[y][x+1] != sval)) sides +=1
+                // check inside corners
+                if ((y-1 >= 0 && (input[y-1][x] == sval)) && (x-1 >= 0 && input[y][x-1] == sval) && input[y-1][x-1] != sval) sides +=1
+                if ((y-1 >= 0 && (input[y-1][x] == sval)) && (x+1 < maxx && input[y][x+1] == sval) && input[y-1][x+1] != sval) sides +=1
+                if ((y+1 < maxy && (input[y+1][x] == sval)) && (x-1 >= 0 && input[y][x-1] == sval) && input[y+1][x-1] != sval) sides +=1
+                if ((y+1 < maxy && (input[y+1][x] == sval)) && (x+1 < maxx && input[y][x+1] == sval) && input[y+1][x+1] != sval) sides +=1
+//                println("($y,$x) $sides")
 
                 for (n in listOf(Pair(y - 1, x), Pair(y + 1, x), Pair(y, x - 1), Pair(y, x + 1))) {
                     val (ny, nx) = n
@@ -34,8 +49,9 @@ fun main() {
                     toCheck.addLast(n)
                 }
             }
-//            println("($sY,$sX): $area, $perimeter")
-            return area * perimeter
+//            println("($sY,$sX): $area, $perimeter, $sides")
+//            return area * perimeter // uncomment for part 1
+            return area * sides //part 2
         }
 
         val res = input.withIndex().fold(0) { acc, (y, row) ->
