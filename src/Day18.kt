@@ -21,7 +21,6 @@ fun main() {
         val q:MutableList<Pair<Int,Int>> = mutableListOf(from)
         dist[from] = 0
         while (q.isNotEmpty()) {
-//            q.println()
             val p = q.removeFirst()
             val (py, px) = p
             for (y in max(0, py-1)..min(maxy, py+1))
@@ -34,8 +33,6 @@ fun main() {
                         dist[np] = dist[p]!! + 1
                         checked.add(np)
                         q.addLast(np)
-//                        println("add $np")
-//                        dist.println()
                         if (np == to) {
                             return dist[np]!!
                         }
