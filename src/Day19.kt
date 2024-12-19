@@ -1,43 +1,34 @@
-import javax.tools.Tool
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.pow
-
 fun main() {
-    val cache = hashMapOf<Pair<List<String>,String>, Boolean>()
+    val cache = hashMapOf<Pair<List<String>,String>, Long>()
 
-    fun canBeDone(towels:List<String>,used:Set<Int>, design:String):Boolean {
-        if (design.isEmpty()) return true
+    fun canBeDone(towels:List<String>, design:String):Long {
+        if (design.isEmpty()) return 1L
         if (cache.containsKey(Pair(towels,design))){
             return cache[Pair(towels,design)]!!
         }
+        var acc = 0L
 
-        for ((i,t) in towels.withIndex()) {
-            if (used.contains(i)) continue
+        for (t in towels) {
             if (design.startsWith(t)) {
-                if (canBeDone(towels, used, design.removePrefix(t)))
-//                    cache[Pair(towels,design)] = true
-                    return true
+                val n = canBeDone(towels, design.removePrefix(t))
+                acc += n
             }
         }
-        cache[Pair(towels,design)] = false
-        return false
+        cache[Pair(towels,design)] = acc
+        return acc
     }
-    fun part1(input: List<String>): Any {
+    fun bothParts(input: List<String>): Any {
         val towels = input[0].split(", ")
-        return input.subList(2,input.size).withIndex().fold(0) { acc, (i,design)->
-            val res = canBeDone(towels, setOf(), design)
-//            if (res) {
-//                design.println()
-//            }
-            acc + if (res) 1 else 0
+        return input.subList(2,input.size).fold(Pair(0,0L)) { acc, design->
+            val res = canBeDone(towels, design)
+            Pair(acc.first + if (res != 0L) 1 else 0, acc.second + res)
         }
     }
 
     val testInput = readInput("Day19_test")
-    part1(testInput).println()
+    bothParts(testInput).println()
 
     val input = readInput("Day19")
-    part1(input).println()
+    bothParts(input).println()
 
 }
