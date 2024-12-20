@@ -4,12 +4,10 @@ import kotlin.math.min
 
 fun main() {
 
-    fun part1(input: List<String>): Any {
+    fun solve(input: List<String>): Any {
         var s:Pair<Int, Int>? = null
         var e:Pair<Int, Int>? = null
         val raceTrack:MutableSet<Pair<Int, Int>> = mutableSetOf()
-        val maxx = input[0].length - 1
-        val maxy = input.size - 1
         val dist:HashMap<Pair<Int,Int>, Int> = hashMapOf()
 
         input.withIndex().forEach { (y, row) ->
@@ -42,31 +40,61 @@ fun main() {
             }
         }
 
-        //check shortcuts
-        val shortcuts:HashMap<Set<Pair<Int,Int>>, Int> = hashMapOf()
-        for (p in raceTrack) {
-            val (y,x) = p
-            for ((dy,dx) in adj) {
-                val n = Pair(y + dy*2, x + dx*2)
-                if (raceTrack.contains(n) && !raceTrack.contains(Pair(y + dy, x + dx))) {
-                    if (!shortcuts.containsKey(setOf(n,p))) {
-                        shortcuts[setOf(n,p)] = abs(dist[n]!! - dist[p]!!) - 2
+        fun part1():Int {
+            //check shortcuts
+            val shortcuts:HashMap<Set<Pair<Int,Int>>, Int> = hashMapOf()
+            for (p in raceTrack) {
+                val (y,x) = p
+                for ((dy,dx) in adj) {
+                    val n = Pair(y + dy*2, x + dx*2)
+                    if (raceTrack.contains(n) && !raceTrack.contains(Pair(y + dy, x + dx))) {
+                        if (!shortcuts.containsKey(setOf(n,p))) {
+                            shortcuts[setOf(n,p)] = abs(dist[n]!! - dist[p]!!) - 2
+                        }
                     }
                 }
             }
+
+            var acc = 0
+            for (v in shortcuts.values) {
+                if (v >= 100) acc += 1
+            }
+            return acc
         }
 
-        var acc = 0
-        for (v in shortcuts.values) {
-            if (v >= 100) acc += 1
+        fun part2():Int {
+            //check shortcuts
+            val shortcuts:HashMap<Set<Pair<Int,Int>>, Int> = hashMapOf()
+            val checked:MutableSet<Pair<Int,Int>> = mutableSetOf()
+            for (p in raceTrack) {
+                checked.add(p)
+                val (y1,x1) = p
+                for (q in raceTrack) {
+                    if (checked.contains(q)) continue
+                    val (y2, x2) = q
+                    val md = abs(y1-y2)+abs(x1-x2)
+                    if ( md <= 20) {
+                        if (!shortcuts.containsKey(setOf(q,p))) {
+                            shortcuts[setOf(q,p)] = abs(dist[q]!! - dist[p]!!) - (md-1)
+                        }
+                    }
+                }
+            }
+
+            var acc = 0
+            for (v in shortcuts.values) {
+                if (v >= 100) acc += 1
+            }
+            return acc
         }
-        return acc
+
+        return Pair(part1(), part2())
     }
 
     val testInput = readInput("Day20_test")
-//    part1(testInput).println()
+//    solve(testInput).println()
 
     val input = readInput("Day20")
-    part1(input).println()
+    solve(input).println()
 
 }
