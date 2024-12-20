@@ -10,7 +10,7 @@ fun main() {
         val raceTrack:MutableSet<Pair<Int, Int>> = mutableSetOf()
         val maxx = input[0].length - 1
         val maxy = input.size - 1
-        val dists:HashMap<Pair<Int,Int>, Int> = hashMapOf()
+        val dist:HashMap<Pair<Int,Int>, Int> = hashMapOf()
 
         input.withIndex().forEach { (y, row) ->
             row.withIndex().forEach { (x, c) ->
@@ -22,35 +22,40 @@ fun main() {
                     }
                     'E' -> {
                         e = Pair(y, x)
+                        raceTrack.add(e!!)
                     }
                 }
             }
         }
         if (s == null || e == null) throw Error("start and end not enabled")
-        for (n in raceTrack) {
-            dists[n] = bfs(raceTrack, maxy, maxx, e!!, n)
+
+        val adj = setOf(Pair(-1,0), Pair(1,0), Pair(0,1), Pair(0,-1))
+        var h = s!!
+        dist[s!!] = 0
+        while (h != e) {
+            for ((dy,dx) in adj) {
+                val n = Pair(h.first + dy, h.second + dx)
+                if (raceTrack.contains(n) && !dist.containsKey(n)) {
+                    dist[n] = dist[h]!! + 1
+                    h = n
+                }
+            }
         }
 
         //check shortcuts
         val shortcuts:HashMap<Set<Pair<Int,Int>>, Int> = hashMapOf()
-        val adj = setOf(Pair(-1,0), Pair(1,0), Pair(0,1), Pair(0,-1))
         for (p in raceTrack) {
             val (y,x) = p
             for ((dy,dx) in adj) {
                 val n = Pair(y + dy*2, x + dx*2)
                 if (raceTrack.contains(n) && !raceTrack.contains(Pair(y + dy, x + dx))) {
                     if (!shortcuts.containsKey(setOf(n,p))) {
-                        shortcuts[setOf(n,p)] = abs(dists[n]!! - dists[p]!!) - 2
+                        shortcuts[setOf(n,p)] = abs(dist[n]!! - dist[p]!!) - 2
                     }
                 }
             }
         }
 
-//        dists.println()
-//        val tmp = hashMapOf<Int,Int>()
-//        shortcuts.values.forEach{ v ->
-//            tmp[v] = tmp.getOrDefault(v, 0).inc()
-//        }
         var acc = 0
         for (v in shortcuts.values) {
             if (v >= 100) acc += 1
@@ -62,6 +67,6 @@ fun main() {
 //    part1(testInput).println()
 
     val input = readInput("Day20")
-    part1(input).println() // 1287 too low 1298 too high
+    part1(input).println()
 
 }
