@@ -1,14 +1,5 @@
 import kotlin.math.min
 
-fun combineStr(s1:Collection<String>, s2:Collection<String>):MutableSet<String> {
-    val res = mutableSetOf<String>()
-    for (a in s1) {
-        for (b in s2)
-            res.add(a+b)
-    }
-    return res
-}
-
 fun findPaths(pad:List<List<Char?>>): HashMap<Pair<Char,Char>,MutableSet<String>> {
     val maxx = pad[0].size-1
     val maxy = pad.size-1
@@ -82,9 +73,9 @@ fun main() {
         val numpadPaths = findPaths(numpad)
         val dirpadPaths = findPaths(dirpad)
 
-        val cache:HashMap<Pair<Pair<Char,String>,Int>, List<String>> = hashMapOf()
+        val cache:HashMap<Pair<Pair<Char,String>,Int>, Long> = hashMapOf()
 
-        fun solveDirpad(code:String, level:Int, maxLevel:Int = 2, startC:Char = 'A'):List<String> {
+        fun solveDirpad(code:String, level:Int, maxLevel:Int = 2, startC:Char = 'A'):Long {
             if (cache.containsKey(Pair(Pair(startC, code),level))) {
                 return cache[Pair(Pair(startC, code),level)]!!
             }
@@ -106,22 +97,22 @@ fun main() {
                 seqs = newSeqs
             }
             if (level == maxLevel) {
-                cache[Pair(Pair(startC,code),level)] = seqs
-                return seqs
+                cache[Pair(Pair(startC,code),level)] = seqs[0].length.toLong()
+                return seqs[0].length.toLong()
             }
-            cache[Pair(Pair(startC, code),level)] = seqs.flatMap { s ->
-                val r1 = s.withIndex().fold(mutableSetOf<String>("")) { acc, (i,c) ->
+
+            //assume that all shortest paths have the same length
+            cache[Pair(Pair(startC, code),level)] = seqs.fold(Long.MAX_VALUE) { r, s ->
+                val r1 = s.withIndex().sumOf {  (i,c) ->
                     val startCC = if (i == 0) 'A' else s[i-1]
-                    combineStr(acc, solveDirpad(c.toString(), level + 1, maxLevel, startCC))
+                    solveDirpad(c.toString(), level + 1, maxLevel, startCC)
                 }
-//                r1.println()
-//                val res = solveDirpad(s, level + 1, maxLevel)
-                r1
+                min(r, r1)
             }
             return cache[Pair(Pair(startC,code),level)]!!
         }
 
-        fun solveNumpad(code:String):Int {
+        fun solveNumpad(code:String):Long {
             //find code positions
             var seqs = mutableListOf<String>()
             for (j in 0..<code.length) {
@@ -140,13 +131,13 @@ fun main() {
                 seqs = newSeqs
             }
 
-            return seqs.flatMap { s ->
-                val r1 = s.withIndex().fold(mutableSetOf<String>("")) { acc, (i,c) ->
+            return seqs.fold(Long.MAX_VALUE) { r, s ->
+                val r1 = s.withIndex().sumOf {  (i,c) ->
                     val startCC = if (i == 0) 'A' else s[i-1]
-                    combineStr(acc, solveDirpad(c.toString(), 1, 3, startCC))
+                    solveDirpad(c.toString(), 1, 25, startCC)
                 }
-                r1
-            }.fold(Int.MAX_VALUE) { acc,st -> min(acc,st.length) }
+                min(r, r1)
+            }
         }
 
         val testNums = listOf(
@@ -164,7 +155,7 @@ fun main() {
             Pair("189A",189),
         )
         var acc = 0L
-        for (numToEnter in testNums) {
+        for (numToEnter in numsToEnter) {
             val res = solveNumpad(numToEnter.first)
             Pair(res, numToEnter.second).println()
             acc += res * numToEnter.second
