@@ -21,6 +21,11 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
  */
 fun Any?.println() = println(this)
 
+data class Vec2(val y:Int,val x:Int) {
+    operator fun plus(other: Vec2): Vec2 {
+        return Vec2(this.y + other.y, this.x + other.x)
+    }
+}
 
 fun gcd(a: Int, b: Int): Int {
     var num1 = a
