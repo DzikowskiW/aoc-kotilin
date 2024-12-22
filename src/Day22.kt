@@ -1,6 +1,3 @@
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 fun calcSecret(v:Long):Long {
     var res = v
@@ -16,31 +13,36 @@ fun calcSecret(v:Long):Long {
     return res
 }
 
-fun main() {
-
-    fun solve(input: List<String>): Any {
-        val secretNums:MutableList<Long> = input.map { it.toLong() }.toMutableList()
-
-//        var n = 123L
-//        for (i in 0..5) {
-//            n = calcSecret(n)
-//            n.println()
-//        }
-
+fun solve(input: List<String>): Any {
+    val secretNums:MutableList<Long> = input.map { it.toLong() }.toMutableList()
+    val seqSum:HashMap<List<Int>, Int> = hashMapOf()
+    secretNums.withIndex().forEach { (k,v) ->
+        val changes:MutableList<Int> = mutableListOf()
+        val maxBananas:HashMap<List<Int>, Int> = hashMapOf()
+        var prevNum = 0L
         for (i in 0..<2000) {
-            secretNums.withIndex().forEach { (k,v) ->
-                secretNums[k] = calcSecret(v)
+            prevNum = secretNums[k]
+            secretNums[k] = calcSecret(secretNums[k])
+            changes.addLast((secretNums[k] % 10 - prevNum % 10).toInt())
+            if (changes.size == 4) {
+                val c = changes.toList()
+                if (!maxBananas.containsKey(c))
+                    maxBananas[c] = (secretNums[k] % 10).toInt()
+                changes.removeFirst()
             }
         }
-        return secretNums.sum()
+        maxBananas.forEach{ (k,v) ->
+            seqSum[k] = seqSum.getOrDefault(k,0) + v
+        }
     }
 
+    return Pair(secretNums.sum(), seqSum.maxBy { (k,v) -> v }.value)
+}
 
-
+fun main() {
     val testInput = readInput("Day22_test")
-//    solve(testInput).println()
+    solve(testInput).println()
 
     val input = readInput("Day22")
     solve(input).println()
-
 }
