@@ -2,24 +2,9 @@
 
 fun main() {
     fun solve(input: List<String>): Any {
-        val g:HashMap<String,MutableSet<String>> = hashMapOf()
-        val cycle3s:MutableSet<Set<String>> = mutableSetOf()
+        val g: HashMap<String, MutableSet<String>> = hashMapOf()
 
-        fun dfs(cur:String, toFind:String, remainingDepth:Int):Set<Set<String>>? {
-            if (remainingDepth == 0){
-                return if (cur == toFind) setOf(setOf(cur)) else null
-            }
-            val a = g[cur]!!.fold(setOf<Set<String>>()) { acc, el ->
-                val res = dfs(el, toFind, remainingDepth - 1)
-                if (res != null) {
-                    acc.union(res.map{ it.union(setOf(cur)) })
-                } else {
-                    acc
-                }
-            }
-            return if (a.isNotEmpty()) a else null
-        }
-
+        // PARSE INPUT
         input.forEach { row ->
             val a = row.split("-")
             if (!g.containsKey(a[0])) g[a[0]] = mutableSetOf()
@@ -28,18 +13,47 @@ fun main() {
             g[a[1]]!!.add(a[0])
         }
 
+        // PART 1
+        val sets1: MutableSet<Set<String>> = mutableSetOf()
         g.keys.forEach { k ->
             if (k.startsWith("t")) {
-                val cycles = dfs(k, k, 3)
-                cycles?.forEach { cycle3s.add(it) }
+                g[k]!!.forEach { k1 ->
+                    g[k1]!!.forEach { k2 ->
+                        g[k2]!!.forEach { k3 ->
+                            if (k3 == k) {
+                                sets1.add(setOf(k, k1, k2))
+                            }
+                        }
+                    }
+                }
             }
         }
-        return cycle3s.size
+        val part1 = sets1.size
+
+        // PART 2
+        val sets2: MutableSet<Set<String>> = mutableSetOf()
+
+        fun search(cur: String, lan: Set<String>) {
+            if (sets2.contains(lan)) return
+            sets2.add(lan)
+            for (c in g[cur]!!) {
+                if (lan.contains(c)) continue
+                if (!g[c]!!.containsAll(lan)) continue
+                search(c, lan + c)
+                sets2.add(lan)
+            }
+        }
+
+        g.keys.forEach { k->
+            search(k, setOf(k))
+        }
+        val part2 = sets2.maxBy { it.size }.sorted().joinToString(",")
+        return Pair(part1,part2)
     }
 
     val testInput = readInput("Day23_test")
     solve(testInput).println()
 
     val input = readInput("Day23")
-    solve(input).println() //2149 too high
+    solve(input).println()
 }
