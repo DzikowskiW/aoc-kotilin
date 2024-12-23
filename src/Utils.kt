@@ -27,6 +27,22 @@ data class Vec2(val y:Int,val x:Int) {
     }
 }
 
+fun printVec2d(points:Set<Vec2>, maxy:Int, maxx:Int) {
+    for (y in 0..maxy) {
+        var line = ""
+        for (x in 0..maxx) {
+            line += if (Vec2(y,x) in points) "o" else "."
+        }
+        line.println()
+    }
+}
+
+val N = Vec2(-1,0)
+val E = Vec2( 0, 1)
+val S = Vec2(1, 0)
+val W = Vec2(0, -1)
+val DIRS = setOf(N,S,E,W)
+
 fun gcd(a: Int, b: Int): Int {
     var num1 = a
     var num2 = b

@@ -1,15 +1,11 @@
 import java.util.PriorityQueue
 
 fun main() {
-    val N = Vec2(-1,0)
-    val E = Vec2( 0, 1)
-    val S = Vec2(1, 0)
-    val W = Vec2(0, -1)
-    val DIRS = setOf(N,S,E,W)
 
-    data class Edge(val to:Vec2, val weight:Int, val dir:Vec2)
 
-    data class Node(val pos:Vec2, val edges:Set<Edge>, val distance: Int) : Comparable<Node> {
+    data class Edge(val to:Vec2, val dir:Vec2, val weight:Int)
+
+    data class Node(val pos:Vec2, val dir:Vec2, val edges:Set<Edge>, val distance: Int) : Comparable<Node> {
         override fun compareTo(other: Node) = distance.compareTo(other.distance)
     }
 
@@ -17,29 +13,57 @@ fun main() {
         val edges = mutableSetOf<Edge>()
         for (d in DIRS) {
             val w = if (d == dir) 1 else 1001
-            if (graph.contains(p + d)) edges.add(Edge(p + d, w, d))
+            if (graph.contains(p + d)) edges.add(Edge(p + d, d, w))
         }
         return edges
     }
 
-    fun dijsktra(road:MutableSet<Vec2>, start:Vec2, end: Vec2):Int {
-        val dist:HashMap<Vec2, Int> = hashMapOf()
-        dist[start] = 0
+    fun getBestPlaceSum(backtrack:HashMap<Pair<Vec2,Vec2>,MutableSet<Pair<Vec2,Vec2>>>, endState:Pair<Vec2,Vec2>):Int {
+        val seen:MutableSet<Pair<Vec2,Vec2>> = mutableSetOf(endState)
+        val stateBacktrack:MutableList<Pair<Vec2,Vec2>> = mutableListOf(endState)
+        while (stateBacktrack.isNotEmpty()) {
+            val state = stateBacktrack.removeFirst()
+            for (n in backtrack.getOrDefault(state, mutableSetOf())) {
+                if (seen.contains(n)) continue
+                seen.add(n)
+                stateBacktrack.addLast(n)
+            }
+        }
+        return seen.map { it.first }.toSet().size
+    }
+
+    fun modifiedDijsktra(road:MutableSet<Vec2>, start:Vec2, end: Vec2):Pair<Int,Int> {
+        val dist:HashMap<Pair<Vec2,Vec2>, Int> = hashMapOf()
+        val backtrack:HashMap<Pair<Vec2,Vec2>,MutableSet<Pair<Vec2,Vec2>>> = hashMapOf()
         val q = PriorityQueue<Node>()
-        q.add(Node(start, findEdges(start, E, road), 0))
+        var minDist = Int.MAX_VALUE
+        var endState:Pair<Vec2,Vec2>? = null
+
+        dist[Pair(start, E)] = 0
+        q.add(Node(start, E, findEdges(start, E, road), 0))
 
         while (q.isNotEmpty()) {
             val cur = q.poll()
-            if (cur.distance > dist.getOrDefault(cur.pos, Int.MAX_VALUE)) continue
+            if (cur.distance > dist.getOrDefault(Pair(cur.pos, cur.dir), Int.MAX_VALUE)) continue
+            if (cur.pos == end && cur.distance <=  minDist) {
+                minDist = cur.distance
+                endState = Pair(cur.pos,cur.dir)
+            }
             for (edge in cur.edges) {
                 val newDist = cur.distance + edge.weight
-                if (newDist < dist.getOrDefault(edge.to, Int.MAX_VALUE)) {
-                    dist[edge.to] = newDist
-                    q.add(Node(edge.to, findEdges(edge.to, edge.dir, road), newDist))
+                val lowestDist = dist.getOrDefault(Pair(edge.to, edge.dir), Int.MAX_VALUE)
+                if (newDist > lowestDist) continue
+                if (newDist < lowestDist){
+                    backtrack[Pair(edge.to, edge.dir)] = mutableSetOf()
+                    dist[Pair(edge.to, edge.dir)] = newDist
                 }
+                backtrack[Pair(edge.to, edge.dir)]!!.add(Pair(cur.pos, cur.dir))
+                q.add(Node(edge.to, edge.dir, findEdges(edge.to, edge.dir, road), newDist))
             }
         }
-        return dist[end]!!
+
+        if (endState == null) throw Exception("No end state for Dijsktra (Impossible challenge)")
+        return Pair(minDist, getBestPlaceSum(backtrack, endState))
     }
 
     fun solve(input:List<String>): Any {
@@ -61,14 +85,13 @@ fun main() {
                 }
             }
         }
-
-        return dijsktra(road, start, end)
+        return modifiedDijsktra(road, start, end)
     }
 
     val testInput = readInput("Day16_test")
     solve(testInput).println()
 
     val input = readInput("Day16")
-    solve(input).println()
+    solve(input).println() //491 too high
 
 }
