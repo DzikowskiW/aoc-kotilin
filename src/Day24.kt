@@ -1,7 +1,9 @@
+import kotlin.math.abs
+import kotlin.math.cos
 
 
 fun main() {
-    data class Device(val l:String, val r:String, val op:String, var lval:Int? = null, var rval:Int? = null ) {
+    data class Device(val l:String, val r:String, val op:String, var res:String, var lval:Int? = null, var rval:Int? = null ) {
         fun calc():Int? {
             if (lval == null || rval == null) return null
             return when (op) {
@@ -31,7 +33,7 @@ fun main() {
             val left = rsplit[0]
             val right = rsplit[2]
             val op = rsplit[1]
-            devices[res] = Device(left , right ,op)
+            devices[res] = Device(left , right ,op, res)
         }
 
         val edge = devices.keys.filter { it.startsWith("z") }.sorted()
@@ -54,7 +56,48 @@ fun main() {
             return d.calc()
         }
 
-        return edge.map { checkDevice(it) }.joinToString("").reversed().toLong(2)
+        val part1 = edge.map { checkDevice(it) }.joinToString("").reversed().toLong(2)
+
+        // part 2
+        // analyzing compliance with full adder https://en.wikipedia.org/wiki/Adder_(electronics)#/media/File:Fulladder.gif
+        val problems = mutableSetOf<String>()
+
+        devices.keys.filter { it.startsWith("z") }.forEach { k ->
+            if (k!= "z45" && devices[k]!!.op != "XOR") {
+                problems.add(k)
+            }
+        }
+
+        devices.keys.forEach { k ->
+            val d = devices[k]!!
+            if (d.op == "XOR" && !( k.startsWith("z") || d.l.startsWith("x") || d.l.startsWith("y") || d.r.startsWith("x") || d.r.startsWith("y"))) {
+                problems.add(k)
+            }
+        }
+
+        devices.keys.forEach { k ->
+            val d = devices[k]!!
+            if (d.op == "AND" && ("x00" != d.l && "x00" != d.r)) {
+                for (dd in devices.values) {
+                    if ((d.res == dd.l || d.res == dd.r) && dd.op != "OR") {
+                        problems.add(d.res)
+                    }
+                }
+            }
+        }
+
+        devices.keys.forEach { k ->
+            val d = devices[k]!!
+            if (d.op == "XOR") {
+                for (dd in devices.values) {
+                    if ((d.res == dd.l || d.res == dd.r) && dd.op == "OR") {
+                        problems.add(d.res)
+                    }
+                }
+            }
+        }
+
+        return Pair(part1, problems.sorted().joinToString(","))
     }
 
     val testInput = readInput("Day24_test")
