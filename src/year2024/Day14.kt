@@ -1,3 +1,7 @@
+package year2024
+
+import println
+import readInput
 import java.io.File
 
 fun displayRobots(vals:List<List<Int>>,width:Int, height:Int, time:Int) {

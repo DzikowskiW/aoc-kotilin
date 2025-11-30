@@ -1,6 +1,9 @@
+package year2024
+
+import println
+import readInput
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
 
 fun main() {
 

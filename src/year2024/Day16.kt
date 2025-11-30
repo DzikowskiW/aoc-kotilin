@@ -1,15 +1,22 @@
+package year2024
+
+import DIRS
+import E
+import Vec2
+import println
+import readInput
 import java.util.PriorityQueue
 
 fun main() {
 
 
-    data class Edge(val to:Vec2, val dir:Vec2, val weight:Int)
+    data class Edge(val to: Vec2, val dir: Vec2, val weight:Int)
 
-    data class Node(val pos:Vec2, val dir:Vec2, val edges:Set<Edge>, val distance: Int) : Comparable<Node> {
+    data class Node(val pos: Vec2, val dir: Vec2, val edges:Set<Edge>, val distance: Int) : Comparable<Node> {
         override fun compareTo(other: Node) = distance.compareTo(other.distance)
     }
 
-    fun findEdges(p:Vec2, dir:Vec2, graph:MutableSet<Vec2>):Set<Edge> {
+    fun findEdges(p: Vec2, dir: Vec2, graph:MutableSet<Vec2>):Set<Edge> {
         val edges = mutableSetOf<Edge>()
         for (d in DIRS) {
             val w = if (d == dir) 1 else 1001
@@ -18,9 +25,9 @@ fun main() {
         return edges
     }
 
-    fun getBestPlaceSum(backtrack:HashMap<Pair<Vec2,Vec2>,MutableSet<Pair<Vec2,Vec2>>>, endState:Pair<Vec2,Vec2>):Int {
-        val seen:MutableSet<Pair<Vec2,Vec2>> = mutableSetOf(endState)
-        val stateBacktrack:MutableList<Pair<Vec2,Vec2>> = mutableListOf(endState)
+    fun getBestPlaceSum(backtrack:HashMap<Pair<Vec2, Vec2>,MutableSet<Pair<Vec2, Vec2>>>, endState:Pair<Vec2, Vec2>):Int {
+        val seen:MutableSet<Pair<Vec2, Vec2>> = mutableSetOf(endState)
+        val stateBacktrack:MutableList<Pair<Vec2, Vec2>> = mutableListOf(endState)
         while (stateBacktrack.isNotEmpty()) {
             val state = stateBacktrack.removeFirst()
             for (n in backtrack.getOrDefault(state, mutableSetOf())) {
@@ -32,12 +39,12 @@ fun main() {
         return seen.map { it.first }.toSet().size
     }
 
-    fun modifiedDijsktra(road:MutableSet<Vec2>, start:Vec2, end: Vec2):Pair<Int,Int> {
-        val dist:HashMap<Pair<Vec2,Vec2>, Int> = hashMapOf()
-        val backtrack:HashMap<Pair<Vec2,Vec2>,MutableSet<Pair<Vec2,Vec2>>> = hashMapOf()
+    fun modifiedDijsktra(road:MutableSet<Vec2>, start: Vec2, end: Vec2):Pair<Int,Int> {
+        val dist:HashMap<Pair<Vec2, Vec2>, Int> = hashMapOf()
+        val backtrack:HashMap<Pair<Vec2, Vec2>,MutableSet<Pair<Vec2, Vec2>>> = hashMapOf()
         val q = PriorityQueue<Node>()
         var minDist = Int.MAX_VALUE
-        var endState:Pair<Vec2,Vec2>? = null
+        var endState:Pair<Vec2, Vec2>? = null
 
         dist[Pair(start, E)] = 0
         q.add(Node(start, E, findEdges(start, E, road), 0))

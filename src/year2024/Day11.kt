@@ -1,3 +1,8 @@
+package year2024
+
+import println
+import readInput
+
 fun main() {
     val cache = hashMapOf<Pair<Long,Int>, Long>()
     fun solve(input: List<String>): Any{

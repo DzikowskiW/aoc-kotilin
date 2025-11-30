@@ -1,3 +1,7 @@
+package year2024
+
+import println
+import readInput
 
 fun main() {
 

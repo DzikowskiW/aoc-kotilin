@@ -1,5 +1,7 @@
-import kotlin.math.abs
-import kotlin.math.cos
+package year2024
+
+import println
+import readInput
 
 
 fun main() {

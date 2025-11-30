@@ -1,3 +1,6 @@
+package year2024
+
+import println
 import kotlin.math.min
 
 fun findPaths(pad:List<List<Char?>>): HashMap<Pair<Char,Char>,MutableSet<String>> {

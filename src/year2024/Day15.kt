@@ -1,5 +1,16 @@
+package year2024
+
+import E
+import N
+import S
+import Vec2
+import W
+import println
+import readInput
+import kotlin.text.iterator
+
 fun main() {
-    fun mapMove(m:Char):Vec2 {
+    fun mapMove(m:Char): Vec2 {
         return when (m) {
             '^' -> N
             '>' -> E
@@ -9,7 +20,7 @@ fun main() {
         }
     }
 
-    fun reverseDir(dir:Vec2):Vec2 {
+    fun reverseDir(dir: Vec2): Vec2 {
         return when (dir) {
             S -> N
             W -> E
@@ -19,7 +30,7 @@ fun main() {
         }
     }
 
-    fun draw(walls:Set<Vec2>, boxes:Set<Vec2>, boxesLeft:Set<Vec2>, robot:Vec2) {
+    fun draw(walls:Set<Vec2>, boxes:Set<Vec2>, boxesLeft:Set<Vec2>, robot: Vec2) {
         for (y in 0..<10) {
             var line = ""
             for (x in 0..<20) {

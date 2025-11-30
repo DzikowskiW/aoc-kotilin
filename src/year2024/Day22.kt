@@ -1,3 +1,8 @@
+package year2024
+
+import println
+import readInput
+
 fun main() {
     fun calcSecret(v:Long):Long {
         var res = v

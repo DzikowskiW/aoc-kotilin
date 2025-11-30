@@ -1,3 +1,7 @@
+package year2024
+
+import println
+import readInput
 
 fun main() {
     val playerPositions = listOf(Pair(-1,0), Pair(0,1), Pair(1,0), Pair(0,-1))

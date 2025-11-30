@@ -1,3 +1,8 @@
+package year2024
+
+import println
+import readInput
+
 fun main() {
 
     fun checkVector(input:List<String>, y:Int, x:Int, toFind:String, vector:Pair<Int,Int>):Int {

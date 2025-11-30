@@ -1,4 +1,7 @@
+package year2024
 
+import println
+import readInput
 
 fun main() {
     fun solve(input: List<String>): Any {

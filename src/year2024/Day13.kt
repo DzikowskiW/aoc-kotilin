@@ -1,4 +1,7 @@
-import kotlin.math.min
+package year2024
+
+import println
+import readInputBlob
 
 class Machine(val a:Pair<Long,Long>, val b:Pair<Long,Long>, val prize:Pair<Long,Long>) {
     override fun toString():String {

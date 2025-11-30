@@ -1,3 +1,9 @@
+package year2024
+
+import gcd
+import println
+import readInput
+
 fun main() {
 
     fun bothParts(input: List<String>): Any {
