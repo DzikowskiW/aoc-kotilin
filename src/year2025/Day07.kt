@@ -40,16 +40,45 @@ fun main() {
         return split(start)
     }
 
-    fun part2(input: List<String>): Int {
-        return 0
+    fun part2(input: List<String>): Long {
+        val splitters = mutableSetOf<Pair<Int, Int>>()
+        val splittersCache = hashMapOf<Pair<Int,Int>, Long>()
+        val start = Pair(0, input.first().indexOfFirst { it == 'S' })
+        val maxY = input.size
+        val maxX = input[0].length
+
+        fun split(point:Pair<Int, Int>):Long {
+            val (y,x) = point
+            if (y > maxY) return 1L
+            if (x !in (0..maxX)) return 1L
+            if (point in splitters) {
+                if (!splittersCache.contains(point)){
+                    splittersCache[point] = split(Pair(y,x-1 )) + split(Pair(y, x+1))
+                }
+                return splittersCache[point]!!
+            } else {
+                return split(Pair(y+1, x))
+            }
+        }
+
+        input.forEachIndexed { y, line ->
+            line.forEachIndexed { x, c ->
+                if (c == '^') {
+                    splitters.add(Pair(y,x))
+                }
+            }
+        }
+//        splitters.println()
+//        start.println()
+        return split(start)
     }
 
 
     val testInput = readInput("Day07_test")
         part1(testInput).println()
-//        part2(testInput).println()
+        part2(testInput).println()
 
     val input = readInput("Day07")
         part1(input).println()
-//        part2(input).println()
+        part2(input).println()
 }
