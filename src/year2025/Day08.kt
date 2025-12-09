@@ -49,11 +49,47 @@ fun main() {
         return resc[0] * resc[1] * resc[2]
     }
 
+    fun part2(input: List<String>): Long{
+        val points = input.map { line -> line.split(',').map { it.toLong() } }.map { Vec3d(it[0], it[1], it[2]) }
+        val pairs = mutableSetOf<Pair<Vec3d,Vec3d>>()
+        for (i in 0..<points.size){
+            for (j in 0..<points.size) {
+                if (i != j && !pairs.contains(Pair(points[j], points[i]))) {
+                    pairs.add(Pair(points[i], points[j]))
+                }
+            }
+        }
+        val sortedPairs = pairs.sortedWith { a,b -> ((a.first.dist(a.second) - b.first.dist(b.second))).toInt() }.toMutableList()
+
+        val circuits = mutableListOf<MutableSet<Vec3d>>()
+        points.forEach { circuits.add(mutableSetOf(it)) }
+
+        while (true){
+            val cur = sortedPairs.removeAt(0)
+            val c1 = circuits.find { it.contains(cur.first) }
+            val c2 = circuits.find { it.contains(cur.second) }
+            if (c1 != null && c2!= null) {
+                if (c1 != c2) {
+                    c1.addAll(c2)
+                    circuits.remove(c2)
+                    if (circuits.size == 1){
+                        cur.first.x.println()
+                        cur.second.x.println()
+                        return cur.first.x * cur.second.x
+                    }
+                }
+            }
+            else {
+                check(false)
+            }
+        }
+    }
+
     val testInput = readInput("Day08_test")
         part1(testInput,10).println()
-//        part2(testInput).println()
+        part2(testInput).println()
 
     val input = readInput("Day08")
-        part1(input, 1000).println() //  too low 58776
-//        part2(input).println()
+        part1(input, 1000).println()
+        part2(input).println()
 }
