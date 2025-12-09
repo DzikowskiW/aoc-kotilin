@@ -6,13 +6,14 @@ import kotlin.math.*
 
 
 fun main() {
-    data class Vec3d(val x:Int, val y: Int,val z: Int) {
+    data class Vec3d(val x:Long, val y: Long,val z: Long) {
         fun dist(o:Vec3d): Double {
             return sqrt((x-o.x).toDouble().pow(2) + (y-o.y).toDouble().pow(2) + (z-o.z).toDouble().pow(2))
         }
+        override fun toString(): String = "($x, $y, $z)"
     }
-    fun part1(input: List<String>): Int {
-        val points = input.map { line -> line.split(',').map { it.toInt() } }.map { Vec3d(it[0], it[1], it[2]) }
+    fun part1(input: List<String>, startCons: Long): Long{
+        val points = input.map { line -> line.split(',').map { it.toLong() } }.map { Vec3d(it[0], it[1], it[2]) }
         val pairs = mutableSetOf<Pair<Vec3d,Vec3d>>()
         for (i in 0..<points.size){
             for (j in 0..<points.size) {
@@ -21,21 +22,38 @@ fun main() {
                 }
             }
         }
-        val sortedPairs = pairs.sortedWith { a,b -> ((a.first.dist(a.second) - b.first.dist(b.second))*1000).toInt() }.toMutableList()
-        val circuits = mutableListOf<MutableSet<Vec3d>>()
-        for (i in 0..10){
-            val cur = sortedPairs.removeAt(0)
+        val sortedPairs = pairs.sortedWith { a,b -> ((a.first.dist(a.second) - b.first.dist(b.second))).toInt() }.toMutableList()
 
+        val circuits = mutableListOf<MutableSet<Vec3d>>()
+        var cons = startCons
+        while (cons > 0){
+            cons -= 1
+            val cur = sortedPairs.removeAt(0)
+            val c1 = circuits.find { it.contains(cur.first) }
+            val c2 = circuits.find { it.contains(cur.second) }
+            if (c1 != null && c2!= null) {
+                if (c1 != c2) {
+                    c1.addAll(c2)
+                    circuits.remove(c2)
+                }
+            }
+            else if (c1 != null) {
+                c1.add(cur.second)
+            } else if (c2 != null) {
+                c2.add(cur.first)
+            } else {
+                circuits.add(mutableSetOf(cur.first, cur.second))
+            }
         }
-//        points.println()
-        return 0
+        val resc = circuits.map { it.size.toLong() }.sortedDescending()
+        return resc[0] * resc[1] * resc[2]
     }
 
     val testInput = readInput("Day08_test")
-        part1(testInput).println()
+        part1(testInput,10).println()
 //        part2(testInput).println()
 
     val input = readInput("Day08")
-//        part1(input).println()
+        part1(input, 1000).println() //  too low 58776
 //        part2(input).println()
 }
