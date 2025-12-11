@@ -5,36 +5,33 @@ import readInput
 
 
 fun main() {
-    fun part1(lines: List<String>): Long{
+
+    fun part12(lines: List<String>){
         val graph = hashMapOf<String, MutableSet<String>>()
 
-        fun findPaths(from:String, checked: Set<String>): Long {
-//            from.println()
-            if (from == "out") return 1L
-            if (!graph.contains(from)) return 0L
-            if (checked.contains(from)) return 0L
-            val newChecked = checked + setOf(from)
-            return graph[from]?.sumOf { findPaths(it, newChecked.toSet()) } ?: 0L
-        }
-        lines.forEach { line ->
-            val (k,edges) = line.split(": ")
-            edges.trim().split(" ").forEach { e->
-                if (graph[k] == null) {
-                    graph[k] = mutableSetOf<String>()
-                }
-                graph[k]!!.add(e)
+        val cache = hashMapOf<Pair<String,String>, Long>()
+        fun findPaths(from:String, to:String): Long {
+            if (!cache.contains(Pair(from,to))) {
+                if (from == to) return 1L
+                cache[Pair(from,to)] = graph[from]?.sumOf { findPaths(it, to) } ?: 0L
             }
+            return cache[Pair(from,to)]!!
         }
 
-        graph.println()
-        return findPaths("you",setOf())
+        lines.forEach { line ->
+            val (k,edges) = line.split(": ")
+            edges.trim().split(" ").forEach { e-> graph.getOrPut(e){ mutableSetOf() }.add(k) } //reversed graph
+        }
+
+        val p1 = findPaths("out","you")
+        val p2 = findPaths("out","fft") * findPaths("fft","dac")* findPaths("dac","svr") + findPaths("out","dac") * findPaths("dac","fft") * findPaths("fft","svr")
+        p1.println()
+        p2.println()
     }
 
     val testInput = readInput("Day11_test")
-        part1(testInput).println()
-//        part2(testInput).println()
+    part12(testInput).println()
 
     val input = readInput("Day11")
-        part1(input).println()
-//        part2(input).println()
+    part12(input)
 }
