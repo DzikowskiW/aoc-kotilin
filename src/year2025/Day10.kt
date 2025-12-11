@@ -13,10 +13,10 @@ fun main() {
                 .removeSurrounding("[", "]")
                 .map{ it == '#'}
                 .toMutableList()
-            val jolts = lineSplit.removeLast()
-                .removeSurrounding("{", "}")
-                .split(",")
-                .map { it.toInt() }
+//            val jolts = lineSplit.removeLast()
+//                .removeSurrounding("{", "}")
+//                .split(",")
+//                .map { it.toInt() }
             val buttons = lineSplit.map {
                 it.removeSurrounding("(", ")").split(",").map { it.toInt() }
             }

@@ -2,21 +2,11 @@ package year2025
 
 import println
 import readInput
-import kotlin.math.*
 
 
 fun main() {
-    data class Vec3d(val x:Long, val y: Long,val z: Long) {
-        fun dist(o:Vec3d): Double {
-            return sqrt((x-o.x).toDouble().pow(2) + (y-o.y).toDouble().pow(2) + (z-o.z).toDouble().pow(2))
-        }
-        override fun toString(): String = "($x, $y, $z)"
-    }
-
-
     fun part1(lines: List<String>): Long{
         val graph = hashMapOf<String, MutableSet<String>>()
-        var sum = 0L
 
         fun findPaths(from:String, checked: Set<String>): Long {
 //            from.println()
@@ -37,8 +27,7 @@ fun main() {
         }
 
         graph.println()
-        sum = findPaths("you",setOf())
-        return sum
+        return findPaths("you",setOf())
     }
 
     val testInput = readInput("Day11_test")
